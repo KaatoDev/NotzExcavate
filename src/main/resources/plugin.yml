@@ -1,0 +1,6 @@
+name: NotzExcavate
+version: '0.1'
+main: notzexcavate.Main
+commands:
+  excavate:
+    usage: /excavate
