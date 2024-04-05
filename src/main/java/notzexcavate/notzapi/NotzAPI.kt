@@ -9,16 +9,20 @@ import notzexcavate.notzapi.utils.MenuU.getLastMenu
 import notzexcavate.notzapi.utils.MessageU.c
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
+import org.bukkit.plugin.java.JavaPlugin
 
-class NotzAPI(messageFile: NotzYAML) {
+class NotzAPI(javaPlugin: JavaPlugin) {
     companion object {
         lateinit var itemManager: ItemManager
         lateinit var messageManager: MessageManager
         lateinit var placeholderManager: PlaceholderManager
+        lateinit var plugin: JavaPlugin
     }
 
     init {
-        messageManager = MessageManager(messageFile)
+        plugin = javaPlugin
+
+        messageManager = MessageManager(NotzYAML(plugin, "messages"))
 
         itemManager = ItemManager()
 

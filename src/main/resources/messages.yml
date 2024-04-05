@@ -1,0 +1,24 @@
+# Utilize {} e o nome do placeholder entre elas:
+# {display} = pega o nome de exibição do player ou da crate (crate e key são o mesmo);
+# {name} = pega o nome do player ou da crate (crate e key são o mesmo);
+# {rarity} = pega a raridade da crate;
+# {default} = utiliza uma própria string já previamente setada no plugin (não tem como mudar isto de fora do plugin);
+# {quantity} = pega a quantia do item.
+
+prefix: '&2[&fNotzExcavator&2]&f'
+
+messages:
+  no-perm: '&cSem permissão.'
+
+items:
+  voltar:
+    name: '&e&lVoltar'
+    lore:
+      - '&7Clique para voltar.'
+    material: ARROW
+  sair:
+    name: '&4&lSair'
+    lore:
+      - '&cClique aqui para'
+      - '&cfechar o menu.'
+    material: BARRIER

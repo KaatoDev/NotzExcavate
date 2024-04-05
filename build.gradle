@@ -20,6 +20,7 @@ repositories {
     maven { url = "https://repo.codemc.io/repository/maven-public/" } // PlotSquared
 //    maven { url = "https://maven.enginehub.org/repo/" }
     maven { url = "https://repo.minebench.de/" }
+    maven { url = 'https://repo.extendedclip.com/content/repositories/placeholderapi/' }
 }
 
 dependencies {
@@ -27,7 +28,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     implementation "com.plotsquared.bukkit:PlotSquared:20.03.28-71943e6-796"
     compileOnly 'com.sk89q.worldedit:worldedit-bukkit:6.1.5'
-
+    compileOnly 'me.clip:placeholderapi:2.11.5'
 }
 
 jar {

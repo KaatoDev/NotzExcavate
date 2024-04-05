@@ -35,6 +35,29 @@ object NotzItems {
     }
 
     /**
+     * @param item ItemStack of the item.
+     * @param name Name of the item.
+     * @param lore Lore of the item.
+     * @param enchanted If the item will be enchanted.
+     * @return The final item.
+     */
+    fun buildItem(item: ItemStack, name: String?, lore: List<String>?, enchantmentLevel: Int): ItemStack {
+        val meta = item.itemMeta
+        if (name != null)
+            meta.displayName = c("$name&r")
+
+        if (lore != null)
+            meta.lore = lore.map { c(it) }
+
+        meta.addEnchant(Enchantment.LUCK, enchantmentLevel, true)
+        meta.addItemFlags(ItemFlag.HIDE_ENCHANTS)
+
+        item.setItemMeta(meta)
+
+        return item
+    }
+
+    /**
      * @param id ID of the item.
      * @param name Name of the item.
      * @param lore Lore of the item.
@@ -70,6 +93,44 @@ object NotzItems {
      */
     fun buildItem(material: Material, name: String, lore: List<String>, enchanted: Boolean): ItemStack {
         return buildItem(ItemStack(material), name, lore, enchanted)
+    }
+
+    /**
+     * @param id ID of the item.
+     * @param name Name of the item.
+     * @param lore Lore of the item.
+     * @param enchanted If the item will be enchanted.
+     * @return The final item.
+     */
+    fun buildItem(id: Int, name: String, lore: List<String>, enchantmentLevel: Int): ItemStack {
+        @Suppress("DEPRECATION")
+        return buildItem(ItemStack(id), name, lore, enchantmentLevel)
+    }
+
+    /**
+     * @param id ID of the item.
+     * @param data Data of the item's ID.
+     * @param name Name of the item.
+     * @param lore Lore of the item.
+     * @param enchanted If the item will be enchanted.
+     * @return The final item.
+     */
+    fun buildItem(id: Int, data: Int, name: String, lore: List<String>, enchantmentLevel: Int): ItemStack {
+        @Suppress("DEPRECATION")
+        return if (data > 999)
+            buildItem(ItemStack(id, 1, 0, data.toByte()), name, lore, enchantmentLevel)
+        else buildItem(ItemStack(id, 1, data.toShort()), name, lore, enchantmentLevel)
+    }
+
+    /**
+     * @param material Material of the item.
+     * @param name Name of the item.
+     * @param lore Lore of the item.
+     * @param enchanted If the item will be enchanted.
+     * @return The final item.
+     */
+    fun buildItem(material: Material, name: String, lore: List<String>, enchantmentLevel: Int): ItemStack {
+        return buildItem(ItemStack(material), name, lore, enchantmentLevel)
     }
 
     /**

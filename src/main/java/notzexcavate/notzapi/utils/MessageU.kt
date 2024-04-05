@@ -48,9 +48,13 @@ object MessageU {
     /**
      * @param player Player who will receive the header.
      */
-    fun sendHeader(player: Player) {
-        player.sendMessage(" ")
-        player.sendMessage(placeholderManager.set("&f-=-=-=-&b= {prefix} &b=&f-=-=-=-"))
+    fun sendHeader(player: Player, message: String) {
+        player.sendMessage(c("""
+            &r
+            &f-=-=-=-&b= ${placeholderManager.set("{prefix}")} &b=&f-=-=-=-
+            $message
+            &r
+        """.trimIndent()))
     }
 
     /**
@@ -160,6 +164,14 @@ object MessageU {
             m += mm.slice(i until i + if (i < mm.length - 3) 3 else 3) + if (mm.length - 3 != i) "." else ""
 
         return m
+    }
+
+    fun formatDate(minutes: Int): String {
+        return formatDate(minutes*60.0)
+    }
+
+    fun formatDate(seconds: Double): String {
+        return formatDate((seconds*1000).toLong())
     }
 
     fun formatDate(timeMillis: Long): String {

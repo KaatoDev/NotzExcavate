@@ -2,5 +2,14 @@ name: NotzExcavate
 version: '0.1'
 main: notzexcavate.Main
 commands:
-  excavate:
-    usage: /excavate
+  nexcavate:
+    usage: /nexcavate
+    aliases:
+      - nex
+      - nescavar
+      - nes
+permissions:
+  notzexcavate.admin:
+    default: false
+  notzexcavate.useany:
+    default: false
