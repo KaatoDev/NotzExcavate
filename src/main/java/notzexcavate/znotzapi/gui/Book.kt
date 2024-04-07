@@ -1,12 +1,12 @@
-package notzexcavate.notzapi.gui
+package notzexcavate.znotzapi.gui
 
-import notzexcavate.notzapi.NotzAPI.Companion.itemManager
-import notzexcavate.notzapi.apis.NotzGUI
-import notzexcavate.notzapi.apis.NotzItems.buildItem
-import notzexcavate.notzapi.apis.NotzItems.getHead
-import notzexcavate.notzapi.utils.EventU.setFunction
-import notzexcavate.notzapi.utils.MenuU.openMenu
-import notzexcavate.notzapi.utils.MenuU.resetBookPages
+import notzexcavate.znotzapi.NotzAPI.Companion.itemManager
+import notzexcavate.znotzapi.apis.NotzGUI
+import notzexcavate.znotzapi.apis.NotzItems.buildItem
+import notzexcavate.znotzapi.apis.NotzItems.getHead
+import notzexcavate.znotzapi.utils.EventU.setFunction
+import notzexcavate.znotzapi.utils.MenuU.openMenu
+import notzexcavate.znotzapi.utils.MenuU.resetBookPages
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory

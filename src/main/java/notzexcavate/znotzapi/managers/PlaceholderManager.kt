@@ -1,8 +1,8 @@
-package notzexcavate.notzapi.managers
+package notzexcavate.znotzapi.managers
 
 import me.clip.placeholderapi.PlaceholderAPI
-import notzexcavate.notzapi.NotzAPI.Companion.messageManager
-import notzexcavate.notzapi.utils.MessageU.c
+import notzexcavate.znotzapi.NotzAPI.Companion.messageManager
+import notzexcavate.znotzapi.utils.MessageU.c
 import org.bukkit.entity.Player
 import java.util.regex.Pattern
 
@@ -54,7 +54,12 @@ open class PlaceholderManager {
         text.split(" ").forEach {
             if (text.contains("{") && text.contains("}"))
                 txt.append(replace(it)).append(" ")
+
+            else txt.append(it).append(" ")
         }
+
+        if (txt[txt.length-1] == ' ')
+            txt.replace(txt.length-1, txt.length-1, "")
 
         return c(txt.toString())
     }
@@ -68,15 +73,7 @@ open class PlaceholderManager {
         if (!(text.contains("{") && text.contains("}")))
             return c(text)
 
-        val txt = StringBuilder()
-
-       text.split(" ").forEach {
-            if (text.contains("{") && text.contains("}"))
-                txt.append(replace(it, default)).append(" ")
-
-        }
-
-        return c(txt.toString())
+        return set(text.replace("{default}", default))
     }
 
     /**
@@ -85,15 +82,20 @@ open class PlaceholderManager {
      * @return The text replaced with the plugin placeholders and PlaceHolderAPI.
      */
     fun set(player: Player, text: String): String {
-        if (!text.contains("%")) {
+        if (!text.contains("%") || text.indexOf("%") == text.lastIndexOf("%")) {
             return set(text)
         }
         val txt = StringBuilder()
 
         set(text).split(" ").forEach {
-            if (text.contains("%") && text.indexOf("%") < text.lastIndexOf("%"))
-                txt.append(PlaceholderAPI.setPlaceholders(player, text)).append(" ")
+            if (it.contains("%") && it.indexOf("%") < it.lastIndexOf("%"))
+                txt.append(PlaceholderAPI.setPlaceholders(player, it)).append(" ")
+
+            else txt.append(it).append(" ")
         }
+
+        if (txt[txt.length-1] == ' ')
+            txt.replace(txt.length-1, txt.length-1, "")
 
         return c(txt.toString())
     }
@@ -106,7 +108,7 @@ open class PlaceholderManager {
      */
     fun set(player: Player, text: String, default: String): String {
         if (!text.contains("%"))
-            return c(text)
+            return set(text, default)
 
         val txt = StringBuilder()
 

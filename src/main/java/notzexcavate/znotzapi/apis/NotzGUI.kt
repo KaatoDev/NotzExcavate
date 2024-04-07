@@ -1,10 +1,10 @@
-package notzexcavate.notzapi.apis
+package notzexcavate.znotzapi.apis
 
-import notzexcavate.notzapi.NotzAPI.Companion.itemManager
-import notzexcavate.notzapi.apis.NotzItems.buildItem
-import notzexcavate.notzapi.apis.NotzItems.glass
-import notzexcavate.notzapi.utils.MenuU.addMenu
-import notzexcavate.notzapi.utils.MessageU.c
+import notzexcavate.znotzapi.NotzAPI.Companion.itemManager
+import notzexcavate.znotzapi.apis.NotzItems.buildItem
+import notzexcavate.znotzapi.apis.NotzItems.glass
+import notzexcavate.znotzapi.utils.MenuU.addMenu
+import notzexcavate.znotzapi.utils.MessageU.c
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.inventory.Inventory

@@ -1,6 +1,6 @@
-package notzexcavate.notzapi.apis
+package notzexcavate.znotzapi.apis
 
-import notzexcavate.notzapi.utils.MessageU.c
+import notzexcavate.znotzapi.utils.MessageU.c
 import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player

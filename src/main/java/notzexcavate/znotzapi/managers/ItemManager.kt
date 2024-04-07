@@ -1,8 +1,8 @@
-package notzexcavate.notzapi.managers
+package notzexcavate.znotzapi.managers
 
-import notzexcavate.notzapi.NotzAPI.Companion.messageManager
-import notzexcavate.notzapi.NotzAPI.Companion.placeholderManager
-import notzexcavate.notzapi.apis.NotzItems.buildItem
+import notzexcavate.znotzapi.NotzAPI.Companion.messageManager
+import notzexcavate.znotzapi.NotzAPI.Companion.placeholderManager
+import notzexcavate.znotzapi.apis.NotzItems.buildItem
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import java.util.*

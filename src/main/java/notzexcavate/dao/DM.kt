@@ -27,10 +27,10 @@ class DM {
     }
 
     fun dropExcavator(excavator: Excavator) {
-        val sql = "delete from excavatormodel where plotid = ?"
+        val sql = "delete from excavatormodel where id = ?"
 
         c.prepareStatement(sql).use { ps ->
-            ps.setString(1, excavator.getPlotID().toString())
+            ps.setInt(1, excavator.id)
 
             ps.execute()
         }
@@ -54,6 +54,33 @@ class DM {
             ps.setString(1, plotid)
 
             ps.executeQuery().use { it.next(); return deserializeExcavator(ByteArrayInputStream(it.getBytes("excavator")))[0] }
+        }
+    }
+
+    fun getExcavatorById(excavatorID: Int): Excavator {
+        val sql = "select * from excavatormodel where id = ?"
+
+        c.prepareStatement(sql).use { ps ->
+            ps.setInt(1, excavatorID)
+
+            ps.executeQuery().use {
+                it.next()
+
+                return deserializeExcavator(ByteArrayInputStream(it.getBytes("excavator")))[0]
+            }
+        }
+    }
+
+    fun getLastExcavatorId(): Int {
+        val sql = "select * from excavatormodel"
+
+        c.prepareStatement(sql).use { ps ->
+            ps.executeQuery().use {
+                var id = 0
+                while (it.next())
+                    id = it.getInt("id")
+                return id
+            }
         }
     }
 
@@ -97,11 +124,11 @@ class DM {
     }
 
     fun updateShovel(shovel: Shovel) {
-        val sql = "update shovelmodel set shovel = ? where id = ?"
+        val sql = "update shovelmodel set shovel = ? where name = ?"
 
         c.prepareStatement(sql).use { ps ->
             ps.setBytes(1, serializeShovel(setOf(shovel)))
-            ps.setInt(2, shovel.id)
+            ps.setString(2, shovel.name)
 
             ps.execute()
         }
@@ -121,7 +148,7 @@ class DM {
         }
     }
 
-    fun getShovelByID(shovelID: Int): Shovel {
+    fun getShovelById(shovelID: Int): Shovel {
         val sql = "select * from shovelmodel where id = ?"
 
         c.prepareStatement(sql).use { ps ->
@@ -190,7 +217,7 @@ class DM {
 
         for (excavator in excavators.indices) {
             val ex = dataInput.readObject() as Excavator.ExcavatorModel
-            excavators[excavator] = Excavator(ex.plotId, ex.plotArea, ex.time, ex.timeLeft, ex.blocks, ex.blocksLeft)
+            excavators[excavator] = Excavator(ex.id, ex.player, ex.plotId, ex.time, ex.timeLeft, ex.blocks)
         }
         dataInput.close()
 

@@ -1,12 +1,12 @@
-package notzexcavate.notzapi.utils
+package notzexcavate.znotzapi.utils
 
-import notzexcavate.notzapi.NotzAPI.Companion.itemManager
-import notzexcavate.notzapi.apis.NotzGUI
-import notzexcavate.notzapi.gui.Book
-import notzexcavate.notzapi.gui.ChestPages
-import notzexcavate.notzapi.utils.EventU.containsTask
-import notzexcavate.notzapi.utils.EventU.getFunction
-import notzexcavate.notzapi.utils.MessageU.c
+import notzexcavate.znotzapi.NotzAPI.Companion.itemManager
+import notzexcavate.znotzapi.apis.NotzGUI
+import notzexcavate.znotzapi.gui.Book
+import notzexcavate.znotzapi.gui.ChestPages
+import notzexcavate.znotzapi.utils.EventU.containsTask
+import notzexcavate.znotzapi.utils.EventU.getFunction
+import notzexcavate.znotzapi.utils.MessageU.c
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 

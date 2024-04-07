@@ -1,9 +1,9 @@
-package notzexcavate.notzapi.utils
+package notzexcavate.znotzapi.utils
 
-import notzexcavate.notzapi.NotzAPI.Companion.itemManager
-import notzexcavate.notzapi.gui.ChestPages
-import notzexcavate.notzapi.utils.MenuU.getLastMenu
-import notzexcavate.notzapi.utils.MessageU.c
+import notzexcavate.znotzapi.NotzAPI.Companion.itemManager
+import notzexcavate.znotzapi.gui.ChestPages
+import notzexcavate.znotzapi.utils.MenuU.getLastMenu
+import notzexcavate.znotzapi.utils.MessageU.c
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack

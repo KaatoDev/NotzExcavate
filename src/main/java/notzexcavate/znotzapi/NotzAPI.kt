@@ -1,12 +1,12 @@
-package notzexcavate.notzapi
+package notzexcavate.znotzapi
 
-import notzexcavate.notzapi.apis.NotzYAML
-import notzexcavate.notzapi.managers.ItemManager
-import notzexcavate.notzapi.managers.MessageManager
-import notzexcavate.notzapi.managers.PlaceholderManager
-import notzexcavate.notzapi.utils.EventU.setFunction
-import notzexcavate.notzapi.utils.MenuU.getLastMenu
-import notzexcavate.notzapi.utils.MessageU.c
+import notzexcavate.znotzapi.apis.NotzYAML
+import notzexcavate.znotzapi.managers.ItemManager
+import notzexcavate.znotzapi.managers.MessageManager
+import notzexcavate.znotzapi.managers.PlaceholderManager
+import notzexcavate.znotzapi.utils.EventU.setFunction
+import notzexcavate.znotzapi.utils.MenuU.getLastMenu
+import notzexcavate.znotzapi.utils.MessageU.c
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin

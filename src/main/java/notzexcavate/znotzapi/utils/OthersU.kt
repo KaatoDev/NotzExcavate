@@ -1,7 +1,8 @@
-package notzexcavate.notzapi.utils
+package notzexcavate.znotzapi.utils
 
-import notzexcavate.notzapi.NotzAPI.Companion.plugin
-import notzexcavate.notzapi.utils.MessageU.send
+import notzexcavate.znotzapi.NotzAPI.Companion.plugin
+import notzexcavate.znotzapi.utils.MessageU.send
+import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.util.Vector
 
@@ -51,5 +52,21 @@ object OthersU {
 
         val y: Double = if (pitch > 0) pitch / 90.0 else 0.25
         player.velocity = player.velocity.add(Vector(x, y, z))
+    }
+
+    fun getPlayerPing(player: Player?): Int {
+        val serverVersion = Bukkit.getServer().javaClass.getPackage().name.replace(".", ",").split(",".toRegex())
+            .dropLastWhile { it.isEmpty() }.toTypedArray()[3]
+
+        return try {
+            val craftPlayer = Class.forName("org.bukkit.craftbukkit.$serverVersion.entity.CraftPlayer")
+            val converted = craftPlayer.cast(player)
+            val handle = converted.javaClass.getMethod("getHandle")
+            val entityPlayer = handle.invoke(converted)
+            entityPlayer.javaClass.getField("ping").getInt(entityPlayer)
+        } catch (ex: Exception) {
+            Bukkit.getConsoleSender().sendMessage(ex.message)
+            -1
+        }
     }
 }

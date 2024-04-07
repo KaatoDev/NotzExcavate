@@ -1,7 +1,7 @@
-package notzexcavate.notzapi.managers
+package notzexcavate.znotzapi.managers
 
-import notzexcavate.notzapi.NotzAPI.Companion.placeholderManager
-import notzexcavate.notzapi.apis.NotzYAML
+import notzexcavate.znotzapi.NotzAPI.Companion.placeholderManager
+import notzexcavate.znotzapi.apis.NotzYAML
 import org.bukkit.entity.Player
 
 open class MessageManager(val messageFile: NotzYAML) {
@@ -26,6 +26,8 @@ open class MessageManager(val messageFile: NotzYAML) {
     fun send(player: Player, message: String?, default: String) {
         if (!message!!.contains(" ") && messageFile.config.contains("messages.$message"))
             player.sendMessage(placeholderManager.set(player, "{prefix} ${messageFile.config.getString("messages.$message")}", default))
+
+        else player.sendMessage(placeholderManager.set(player, "{prefix} $message", default))
     }
 
     /**

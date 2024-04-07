@@ -6,10 +6,14 @@ import notzexcavate.entities.Excavator
 import notzexcavate.entities.Shovel
 
 object DatabaseManager {
-    val dm = DM()
+    private val dm = DM()
 
-    fun insertExcavatorDB(excavator: Excavator) {
+    fun insertExcavatorDB(excavator: Excavator): Excavator {
         dm.insertExcavator(excavator)
+
+        val ex = Excavator(dm.getLastExcavatorId(), excavator.owner, excavator.plotId, excavator.time, excavator.timeLeft, excavator.blocks)
+        ex.save()
+        return ex
     }
 
     fun dropExcavatorDB(excavator: Excavator) {
@@ -31,7 +35,9 @@ object DatabaseManager {
 
     fun insertShovelDB(shovel: Shovel): Shovel {
         dm.insertShovel(shovel)
-        return Shovel(dm.getLastShovelId(), shovel.name, shovel.getDisplay(), shovel.getDuration(), shovel.getMaterial())
+        val sh = Shovel(dm.getLastExcavatorId(), shovel.name, shovel.getDisplay(), shovel.getDuration(), shovel.getMaterial())
+        sh.save()
+        return sh
     }
 
     fun dropShovelDB(shovel: Shovel) {
@@ -47,7 +53,7 @@ object DatabaseManager {
     }
 
     fun getShovelByIdDB(shovelID: Int) {
-        dm.getShovelByID(shovelID)
+        dm.getShovelById(shovelID)
     }
 
     fun loadShovelsDB(): HashMap<String, Shovel> {

@@ -1,13 +1,12 @@
-package notzexcavate.notzapi.utils
+package notzexcavate.znotzapi.utils
 
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.ClickEvent
 import net.md_5.bungee.api.chat.HoverEvent
 import net.md_5.bungee.api.chat.TextComponent
-import notzexcavate.notzapi.NotzAPI.Companion.messageManager
-import notzexcavate.notzapi.NotzAPI.Companion.placeholderManager
+import notzexcavate.znotzapi.NotzAPI.Companion.messageManager
+import notzexcavate.znotzapi.NotzAPI.Companion.placeholderManager
 import org.bukkit.entity.Player
-import java.util.*
 
 object MessageU {
     /**
@@ -54,7 +53,7 @@ object MessageU {
             &f-=-=-=-&b= ${placeholderManager.set("{prefix}")} &b=&f-=-=-=-
             $message
             &r
-        """.trimIndent()))
+        """.replace("            ", "")))
     }
 
     /**
@@ -166,47 +165,50 @@ object MessageU {
         return m
     }
 
-    fun formatDate(minutes: Int): String {
-        return formatDate(minutes*60.0)
+    fun formatDate(minutes: Int, withMillis: Boolean): String {
+        return formatDate(minutes*60.0, withMillis)
     }
 
-    fun formatDate(seconds: Double): String {
-        return formatDate((seconds*1000).toLong())
+    fun formatDate(seconds: Double, withMillis: Boolean): String {
+        return formatDate((seconds*1000).toLong(), withMillis)
     }
 
-    fun formatDate(timeMillis: Long): String {
-        val date = Date(timeMillis)
+    fun formatDate(timeMillis: Long, withMillis: Boolean): String {
+        val millis = (timeMillis%1000).toInt()
+        var seconds = if (timeMillis/1000 > 0) { val t = timeMillis/1000; t.toInt() } else 0
+        var minutes = if (seconds/60 > 0) { val t = seconds/60; seconds %= 60; t } else 0
+        var hours = if (minutes/60 > 0) { val t = minutes/60; minutes %= 60; t } else 0
+        var days = if (hours/24 > 0) { val t = hours/24; hours %= 24; t } else 0
+        var months = if (days/30 > 0) { val t = days/30; days %= 30; t } else 0
+        val years = if (months/12 > 0) { val t = months/12; months %= 12; t } else 0
 
-        val days = 1 + if (date.date > 1 && date.month > 0)  "0 31 48 79 109 140 170 201 232 262 293 323".split(" ")[date.month].toInt() else 0
-
-        val years = date.year+1900
-        while (days > 364) {
-            years.inc()
-            days.minus(365)
-        }
-
-        val times = listOf(years, days/30, days%30, date.hours, date.minutes, date.seconds)
-        val dateFormatted = ""
+        val times = listOf(years, months, days, hours, minutes, seconds)
+        val dateFormatted = StringBuilder("")
         val count = 0
+
         times.indices.forEach {
             if (times[it] > 0) {
                 count.inc()
 
                 if (dateFormatted.isNotBlank())
-                    dateFormatted.plus(" ")
+                    dateFormatted.append(", ")
 
-                dateFormatted.plus(when (it) {
+                dateFormatted.append("${times[it]} ").append(when (it) {
                     0 -> "ano"
                     1 -> if (times[it] == 1) "mês" else "meses"
                     2 -> "dia"
                     3 -> "hora"
                     4 -> "minuto"
                     5 -> "segundo"
-                    else -> ""
-                }).plus(if (it != 1 && times[it] > 1) "s" else "")
-
+                    else -> {""}
+                }).append(if (it != 1 && times[it] > 1) "s" else "")
             }
         }
-        return dateFormatted
+
+        var result = (if (dateFormatted.contains(", ")) dateFormatted.replace(dateFormatted.lastIndexOf(", "), dateFormatted.lastIndexOf(", ")+2, " e ") else dateFormatted).toString().replace("[", "").replace(")", "")
+
+        if (withMillis && millis > 0) result = result.replace("$seconds segundo", "$seconds.$millis segundo")
+
+        return result
     }
 }

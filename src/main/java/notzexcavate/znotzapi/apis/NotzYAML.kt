@@ -1,4 +1,4 @@
-package notzexcavate.notzapi.apis
+package notzexcavate.znotzapi.apis
 
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration

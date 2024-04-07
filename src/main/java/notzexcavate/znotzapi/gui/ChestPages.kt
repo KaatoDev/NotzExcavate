@@ -1,8 +1,8 @@
-package notzexcavate.notzapi.gui
+package notzexcavate.znotzapi.gui
 
-import notzexcavate.notzapi.NotzAPI.Companion.itemManager
-import notzexcavate.notzapi.apis.NotzGUI
-import notzexcavate.notzapi.apis.NotzItems.glass
+import notzexcavate.znotzapi.NotzAPI.Companion.itemManager
+import notzexcavate.znotzapi.apis.NotzGUI
+import notzexcavate.znotzapi.apis.NotzItems.glass
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack

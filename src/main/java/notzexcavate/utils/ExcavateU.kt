@@ -1,19 +1,13 @@
 package notzexcavate.utils
 
 import com.intellectualcrafters.plot.`object`.Plot
-import com.intellectualcrafters.plot.`object`.PlotId
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.block.Block
 
 object ExcavateU {
-    private val plotBlocksList = hashMapOf<PlotId, MutableList<Block>>()
-
     fun getBlocks(plot: Plot): MutableList<Block> {
-        if (plotBlocksList.containsKey(plot.id))
-            return plotBlocksList[plot.id]!!
-
         val blocks = mutableListOf<Block>()
         val region = plot.regions.first()
 
@@ -27,8 +21,6 @@ object ExcavateU {
                 }
                 reverse = !reverse
             }
-
-        plotBlocksList[plot.id] = blocks
         return blocks
     }
 }
