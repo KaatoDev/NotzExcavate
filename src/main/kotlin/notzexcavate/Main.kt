@@ -22,7 +22,6 @@ class Main : JavaPlugin() {
     companion object {
         lateinit var pathRaw: String
         lateinit var cf: NotzYAML
-        lateinit var sqlf: NotzYAML
         lateinit var msgf: NotzYAML
 
         lateinit var papi: PlotAPI
@@ -32,11 +31,11 @@ class Main : JavaPlugin() {
     override fun onEnable() {
         papi = PlotAPI()
         pathRaw = dataFolder.absolutePath
+        println(pathRaw)
 
         NotzAPI(this)
 
         cf = NotzYAML(this, "config")
-        sqlf = NotzYAML(this, "notzExcavator")
         msgf = messageManager.messageFile
 
         server.scheduler.runTaskLater(this, {

@@ -1,6 +1,7 @@
 plugins {
     id 'java'
-    id 'org.jetbrains.kotlin.jvm' version '1.9.23'
+    id 'org.jetbrains.kotlin.jvm' version '2.0.0'
+    id "com.github.johnrengelman.shadow" version "8.1.1"
 }
 
 group = 'Notz'
@@ -25,6 +26,7 @@ dependencies {
     compileOnly "org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     implementation "com.plotsquared.bukkit:PlotSquared:20.03.28-71943e6-796"
+    implementation 'org.xerial:sqlite-jdbc:3.46.0.0'
     compileOnly 'com.sk89q.worldedit:worldedit-bukkit:6.1.5'
     compileOnly 'me.clip:placeholderapi:2.11.5'
 }
@@ -60,4 +62,7 @@ processResources {
 }
 kotlin {
     jvmToolchain(8)
+}
+tasks.build {
+    dependsOn(shadowJar)
 }
