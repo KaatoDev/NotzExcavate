@@ -1,6 +1,9 @@
 name: NotzExcavate
-version: '1.1'
-main: notzexcavate.Main
+version: '1.2'
+main: dev.kaato.notzexcavate.NotzExcavate
+depend: [PlotSquared]
+#api-version: '1.18'
+
 commands:
   nexcavate:
     usage: /nexcavate
@@ -8,6 +11,11 @@ commands:
       - nex
       - nescavar
       - nes
+  excavate:
+    usage: /excavate
+    aliases:
+      - excavator
+      - status
 permissions:
   notzexcavate.admin:
     default: false

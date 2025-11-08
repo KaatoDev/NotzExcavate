@@ -1,24 +1,77 @@
-# Utilize {} e o nome do placeholder entre elas:
-# {display} = pega o nome de exibição do player ou da crate (crate e key são o mesmo);
-# {name} = pega o nome do player ou da crate (crate e key são o mesmo);
-# {rarity} = pega a raridade da crate;
-# {default} = utiliza uma própria string já previamente setada no plugin (não tem como mudar isto de fora do plugin);
-# {quantity} = pega a quantia do item.
+# {default} = uses a pre-set string in the plugin (this cannot be changed outside the plugin)
+# {default<number>} = uses a pre-set string in the plugin in ascending order (the order and the string cannot be changed outside the plugin)
+# It is not possible to switch between a single default or multiple defaults; use it as it is in the message!
 
-prefix: '&2[&fNotzExcavator&2]&f'
+prefix: '&2[&fNotzExcavate&2]&f'
 
 messages:
-  no-perm: '&cSem permissão.'
-
-items:
-  voltar:
-    name: '&e&lVoltar'
-    lore:
-      - '&7Clique para voltar.'
-    material: ARROW
-  sair:
-    name: '&4&lSair'
-    lore:
-      - '&cClique aqui para'
-      - '&cfechar o menu.'
-    material: BARRIER
+  no-perm: '&cNo permission.'
+  addAllowedBlock1: '&eYou added the block &f{default} &eto the allowed list!'
+  addAllowedBlock2: '&eThe block &f{default} &eis already in the allowed list!'
+  addBlockedBlock1: '&eYou added the block &f{default} &eto the blocked list!'
+  addBlockedBlock2: '&eThe block &f{default} &eis already in the blocked list!'
+  remAllowedBlock1: '&eYou removed the block &f{default} &efrom the allowed list.'
+  remAllowedBlock2: '&eThe block &f{default} &eis not in the allowed list.'
+  remBlockedBlock1: '&eYou removed the block &f{default} &efrom the blocked list.'
+  remBlockedBlock2: '&eThe block &f{default} &eis not in the blocked list.'
+  clearAllowedBlocks1: '&eYou reset the allowed list!'
+  clearBlockedBlocks2: '&eYou reset the blocked list!'
+  invalidBlock: '&cEnter a valid block!'
+  notInPlot: '&cYou need to be in a plot!'
+  excavationStart: '&aThe excavation of plot &f{default0} ({default1}&f) &ahas begun.'
+  excavationStartOwner: '&aThe excavation of your plot &f{default} &ahas begun.'
+  status: "\n
+            &3PlotID: &f{default0}\n
+            &3Owner: &f{default1}\n
+            &3Total Time: &f{default2}\n
+            &3Remaining Time: &f{default3}\n
+            &aAllowed &eBlocks&3: &f{default4}.\n
+            &cBlocked &eBlocks&3: &f{default5}.\n
+            &eStatus: &f{default6}\n
+            &a{default7}&e% - {default8}&r
+  "
+  plotCompleted: "&cThis plot has already been excavated!"
+  plotFinished: "&aPlot successfully excavated in &2{default}&a!"
+  excavatorCancelled1: "&eCleanup of this plot has been cancelled!"
+  excavatorCancelled2: "&eCleanup of plot {default0} ({default1}) has been cancelled!"
+  notStarted: "Not started"
+  running: "In progress"
+  paused: "Stopped"
+  completed: "Completed"
+  offlinePlayer: "&cThis player is offline or does not exist."
+  removeExcavatorCMD1: "&eExcavator successfully removed from the plot!"
+  removeExcavatorCMD2: "&cUnable to remove the Excavator!"
+  deleteShovelCMD1: "&eShovel &f{default} &esuccessfully deleted."
+  deleteShovelCMD2: "&cUnable to delete Shovel {default}&c."
+  setMaterialCMD1: "&eThe material of Shovel &f{default0} &ehas been changed from &f{default1} &eto &f{default2}&e."
+  setMaterialCMD2: "&cHold an item in your hand to be the base material."
+  setDisplayCMD: "&eThe display of Shovel &f{default0} &ehas been changed from &f{default1} &eto {default2}&e."
+  validNumber1: "&cEnter a valid number!"
+  validNumber2: "&cThe Shovel's duration must be greater than 0."
+  validNumber3: "&cEnter a valid number between 1 and {default}!"
+  setDurationCMD1: "&eThe duration of Shovel &f{default0} &ehas been changed from &f{default1} &eto &f{default2}&e."
+  setDurationCMD2: "&eThe duration of the Shovel &f{default0} &ewas set to &f{default1}&e."
+  viewAllowedCMD: "&eAllowed blocks: &f{default}"
+  viewBlockedCMD: "&eBlocked blocks: &f{default}"
+  getRunningExcavators1: "&e{default0}: &f{default1}"
+  getRunningExcavators2: "&cThere are no active, running, or paused Excavators."
+  getCompletedExcavators1: "&eCompleted Excavators: &f{default}"
+  getCompletedExcavators2: "&cNo completed Excavators."
+  getAllExcavators1: "&eAll Excavators: &f{default}"
+  getAllExcavators2: "&cThere is no Excavators created."
+  stopExcavator1: "&cThe Excavator for this plot is not active."
+  stopExcavator2: "&cThere is no Excavator in this plot yet!"
+  getExcavatorStatus: "&cNo excavation has been started in this plot yet!"
+  restartExcavators: "&eExcavators successfully restarted! \n{default}\n"
+  saveExcavators: "&eExcavators successfully saved!"
+  createShovel: "&aThe &f&lShovel &f{default} &awas successfully created!"
+  giveShovel1: "&aYou received a &f{default} &aexcavator!"
+  giveShovel2: "&eYou gave a &f{default0} &eexcavator to player &f{default1}&e!"
+  giveShovel3: "&aYou received &2{default0} &f{default1} &aexcavators!"
+  giveShovel4: "&eYou gave &2{default0} &f{default1} &eexcavators to player &f{default2}&e!"
+  updateShovel1: "&eYour Shovel &f{default} &ehas been updated!"
+  updateShovel2: "&eYou updated the Shovel {default0} of &f{default1} &eplayers/items!"
+  clickShovel: "&eClick with the item in the air."
+  noPermissionExcavator: "&eYou can only use excavators on your plot!"
+  emptyPlot: "&eThis plot has no owner."
+  startExcavatorFromShovel: "&eThe duration of the Shovel &f{default} &eis &cstill not &eset."

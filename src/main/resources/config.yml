@@ -5,3 +5,11 @@ mysql:
   database: 'db_notzexcavate'
   user: 'root'
   password: ''
+
+## If you added 'ALL' in first line, it will allow ALL BLOCKS to be excavated by default!
+## If the shovel has any blocked block, it will exclude it from the allowed blocks from here or from itself.
+allowed-blocks: # Not case-sensitive
+# - 'ALL'
+  - 'GRASS'
+  - 'DIRT'
+  - 'STONE'
