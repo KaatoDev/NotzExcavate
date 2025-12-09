@@ -12,7 +12,9 @@ import dev.kaato.notzapi.utils.*
 import dev.kaato.notzapi.utils.MessageU.Companion.sendHoverURL
 import dev.kaato.notzexcavate.commands.ExcavateC
 import dev.kaato.notzexcavate.commands.NExcavateC
+import dev.kaato.notzexcavate.database.DAO
 import dev.kaato.notzexcavate.events.ExcavatorEv
+import dev.kaato.notzexcavate.managers.ExcavateManager.checkExcavators
 import dev.kaato.notzexcavate.managers.ExcavateManager.loadExcavators
 import dev.kaato.notzexcavate.managers.ExcavateManager.saveExcavators
 import dev.kaato.notzexcavate.managers.ExcavateManager.stopExcavators
@@ -23,6 +25,7 @@ import org.bukkit.Bukkit.getConsoleSender
 import org.bukkit.Bukkit.getPluginManager
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scheduler.BukkitRunnable
+import kotlin.system.measureTimeMillis
 
 class NotzExcavate : JavaPlugin() {
     companion object {
@@ -44,34 +47,47 @@ class NotzExcavate : JavaPlugin() {
 
         lateinit var papi: PlotAPI
         var started = false
+        lateinit var dao: DAO
     }
 
     override fun onEnable() {
         if (getPluginManager().getPlugin("PlotSquared") != null) {
-            pathRaw = dataFolder.absolutePath
-            papi = PlotAPI()
-            plugin = this
-            napi = addPlugin(plugin)
+            val load = measureTimeMillis {
+                pathRaw = dataFolder.absolutePath
+                papi = PlotAPI()
+                plugin = this
+                napi = addPlugin(plugin)
 
-            messageManager = napi.messageManager
-            itemManager = napi.itemManager
-            placeholderManager = napi.placeholderManager
-            eventU = napi.eventU
-            mainU = napi.mainU
-            menuU = napi.menuU
-            messageU = napi.messageU
-            othersU = napi.othersU
+                messageManager = napi.messageManager
+                itemManager = napi.itemManager
+                placeholderManager = napi.placeholderManager
+                eventU = napi.eventU
+                mainU = napi.mainU
+                menuU = napi.menuU
+                messageU = napi.messageU
+                othersU = napi.othersU
 
-            cf = NotzYAML(this, "config")
-            msgf = messageManager.messageFile
+                cf = NotzYAML(this, "config")
+                msgf = messageManager.messageFile
 
+                try {
+                    dao = DAO()
+                    dao.init()
+
+                    loadExcavators()
+                    loadShovels()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
 
             object : BukkitRunnable() {
                 override fun run() {
                     startPlugin()
-                    Bukkit.getOnlinePlayers().forEach { if (it.hasPermission("notzcrates.admin")) messageU.send(it, "&2NotzEscavate &ainitialized!") }
+                    Bukkit.getOnlinePlayers().forEach { if (it.hasPermission("notzcrates.admin")) messageU.send(it, "&2NotzEscavate &ainitialized! (${load/1000.0}s)") }
                 }
             }.runTaskLater(this, 4 * 20L)
+
         }
     }
 
@@ -83,12 +99,10 @@ class NotzExcavate : JavaPlugin() {
     }
 
     private fun startPlugin() {
-        loadExcavators()
-        loadShovels()
-
         regCommands()
         regEvents()
         regTab()
+        checkExcavators()
 
         letters()
         started = true

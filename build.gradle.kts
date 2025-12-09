@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "dev.kaato"
-version = "1.2"
+version = "1.3"
 
 repositories {
     mavenCentral()
@@ -26,7 +26,13 @@ dependencies {
     implementation("dev.kaato:NotzAPI:0.4.8")
     implementation("com.plotsquared.bukkit:PlotSquared:20.03.28-71943e6-796")
     implementation("org.xerial:sqlite-jdbc:3.46.0.0")
+    implementation("com.mysql:mysql-connector-j:9.5.0")
     compileOnly("com.sk89q.worldedit:worldedit-bukkit:6.1.5")
+    implementation("org.jetbrains.exposed:exposed-core:0.61.0")
+    implementation("org.jetbrains.exposed:exposed-jdbc:0.61.0")
+    implementation("org.jetbrains.exposed:exposed-dao:0.61.0")
+    implementation("org.jetbrains.exposed:exposed-java-time:0.61.0")
+    implementation("org.jetbrains.exposed:exposed-json:0.61.0")
 }
 
 //tasks {

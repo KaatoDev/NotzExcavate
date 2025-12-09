@@ -4,114 +4,115 @@ import com.intellectualcrafters.plot.`object`.Plot
 import com.intellectualcrafters.plot.`object`.PlotId
 import dev.kaato.notzapi.utils.MessageU.Companion.join
 import dev.kaato.notzexcavate.NotzExcavate.Companion.messageU
-import dev.kaato.notzexcavate.NotzExcavate.Companion.placeholderManager
-import dev.kaato.notzexcavate.entities.Excavator
-import dev.kaato.notzexcavate.entities.Shovel
+import dev.kaato.notzexcavate.database.DatabaseManager.containExcavatorsDB
+import dev.kaato.notzexcavate.database.DatabaseManager.loadExcavatorsDB
+import dev.kaato.notzexcavate.entities.ExcavatorV2
+import dev.kaato.notzexcavate.entities.ShovelV2
 import dev.kaato.notzexcavate.enums.Status
-import dev.kaato.notzexcavate.managers.DatabaseManager.dropExcavatorDB
-import dev.kaato.notzexcavate.managers.DatabaseManager.loadExcavatorsDB
 import org.bukkit.entity.Player
 
 object ExcavateManager {
-    private val excavators = hashMapOf<PlotId, Excavator>()
+    private val excavators = hashMapOf<PlotId, ExcavatorV2>()
 
     fun isRunningOrComplete(plot: Plot): Boolean {
         return excavators[plot.id]!!.isRunning() || excavators[plot.id]!!.isCompleted()
     }
 
-    fun getRunningExcavators(p: Player) {
-        val notStarted = excavators.values.filter { it.isntStarted() }.map { "(${it.getPlotID()}, ${it.owner.name})" }
-        val running = excavators.values.filter { it.isRunning() }.map { "(${it.getPlotID()}, ${it.owner.name})" }
-        val onBreak = excavators.values.filter { it.isOnBreak() }.map { "(${it.getPlotID()}, ${it.owner.name})" }
+    fun getRunningExcavators(player: Player) {
+        val notStarted = excavators.values.filter { it.isntStarted() }.map { "(${it.plotId}, ${it.player})" }
+        val running = excavators.values.filter { it.isRunning() }.map { "(${it.plotId}, ${it.player})" }
+        val onBreak = excavators.values.filter { it.isOnBreak() }.map { "(${it.plotId}, ${it.player})" }
+        val listed = listOf(
+            Status.NOTSTARTED.description,
+            if (notStarted.isNotEmpty()) join(notStarted) else "Empty",
+            Status.RUNNING.description,
+            if (running.isNotEmpty()) join(running) else "Empty",
+            Status.PAUSED.description,
+            if (onBreak.isNotEmpty()) join(onBreak) else "Empty"
+        )
 
-        messageU.sendHeader(
-            p, """
-            ${if (notStarted.isNotEmpty()) placeholderManager.set("getRunningExcavators1", defaults = listOf(Status.NOTSTARTED.description, join(notStarted))) else ""}
-            ${if (running.isNotEmpty()) placeholderManager.set("getRunningExcavators1", defaults = listOf(Status.RUNNING.description, join(running))) else ""}
-            ${if (onBreak.isNotEmpty()) placeholderManager.set("getRunningExcavators1", defaults = listOf(Status.PAUSED.description, join(onBreak))) else ""}
-            """.trimIndent().ifBlank { placeholderManager.set("getRunningExcavators2") })
+
+        messageU.sendHeader(player, if (notStarted.isNotEmpty() || running.isNotEmpty() || onBreak.isNotEmpty()) "getRunningExcavators1" else "getRunningExcavators2", defaults = listed)
     }
 
-    fun getCompletedExcavators(p: Player) {
-        val completed = excavators.values.filter { it.isCompleted() }.map { "(${it.getPlotID()}, ${it.owner.name})" }
+    fun getCompletedExcavators(player: Player) {
+        val completed = excavators.values.filter { it.isCompleted() }.map { "(${it.plotId}, ${it.player})" }
 
         if (completed.isNotEmpty())
-            messageU.send(p, "getCompletedExcavators1", join(completed))
-        else messageU.send(p, "getCompletedExcavators2")
+            messageU.send(player, "getCompletedExcavators1", join(completed))
+        else messageU.send(player, "getCompletedExcavators2")
     }
 
-    fun getAllExcavators(p: Player) {
-        val all = excavators.values.map { "(${it.getPlotID()}, ${it.owner.name})" }
+    fun getAllExcavators(player: Player) {
+        val all = excavators.values.map { "(${it.plotId}, ${it.player})" }
 
         if (all.isNotEmpty())
-            messageU.send(p, "getAllExcavators1", join(all))
-        else messageU.send(p, "getAllExcavators2")
+            messageU.send(player, "getAllExcavators1", join(all))
+        else messageU.send(player, "getAllExcavators2")
     }
 
-    fun stopExcavator(p: Player, plot: Plot) {
+    fun stopExcavator(player: Player, plot: Plot) {
         if (excavators.keys.contains(plot.id)) {
             if (excavators[plot.id]!!.isRunning())
-                excavators[plot.id]!!.stop(p)
-            else messageU.send(p, "stopExcavator1")
-        } else messageU.send(p, "stopExcavator2")
+                excavators[plot.id]!!.stop(player)
+            else messageU.send(player, "stopExcavator1")
+        } else messageU.send(player, "stopExcavator2")
     }
 
     fun containsExcavator(plot: Plot): Boolean {
         return excavators.containsKey(plot.id)
     }
 
-    fun startExcavator(p: Player, plot: Plot, shovel: Shovel) {
-        val excavator = Excavator(plot, shovel.getDuration(), shovel.getAllowedBlocks(), shovel.getBlockedBlocks())
+    fun startExcavator(player: Player, plot: Plot, shovel: ShovelV2): Boolean {
+        val excavator = ExcavatorV2(plot, shovel)
         excavators[plot.id] = excavator
-        excavator.start(p)
+        return excavator.start(player)
     }
 
-    fun removeExcavator(plot: Plot): Boolean {
-        return removeExcavator(excavators[plot.id])
+    fun removeExcavator(plot: Plot): Boolean? {
+        return removeExcavator(excavators[plot.id] ?: return false)
     }
 
-    fun removeExcavator(excavator: Excavator?): Boolean {
+    fun removeExcavator(excavator: ExcavatorV2): Boolean? {
         return try {
-            if (excavator != null && excavators.containsValue(excavator)) {
-                if (excavator.isRunning())
-                    excavator.stop()
-
-                excavators.remove(excavator.getPlotID())
-                dropExcavatorDB(excavator)
-
-            }
-            true
+            println(excavator.plot.id)
+            val res = excavator.deleteForever()
+            if (res == true) {
+                excavators.remove(excavator.plot.id)
+                true
+            } else res
         } catch (e: Exception) {
             e.printStackTrace()
             false
         }
     }
 
-    fun getExcavatorStatus(p: Player, plot: Plot) {
+    fun getExcavatorStatus(player: Player, plot: Plot) {
         if (!containsExcavator(plot))
-            messageU.send(p, "getExcavatorStatus")
-        else if (excavators[plot.id]!!.status(p))
-            messageU.send(p, "plotCompleted")
+            messageU.send(player, "getExcavatorStatus")
+        else if (excavators[plot.id]!!.status(player))
+            messageU.send(player, "plotCompleted")
     }
 
     fun loadExcavators() {
-        val exs = loadExcavatorsDB()
-        if (exs.isEmpty())
-            return
-
-        exs.forEach { excavators[it.key] = it.value }
-        restartExcavators()
+        if (containExcavatorsDB())
+            loadExcavatorsDB().forEach { excavators[it.plot.id] = it }
     }
 
-    fun restartExcavators(p: Player) {
+    fun checkExcavators() {
+        excavators.values.filter {
+            it.isntStarted() || it.isRunning()
+        }.forEach { it.start() }
+    }
+
+    fun restartExcavators(player: Player) {
         restartExcavators()
-        messageU.send(p, "restartExcavators", join(excavators.values.filter { it.isntStarted() && it.isRunning() }.map { "(${it.getPlotID()}, ${it.owner.name})" }))
+        messageU.send(player, "restartExcavators", join(excavators.values.filter { it.isntStarted() && it.isRunning() }.map { "(${it.plotId}, ${it.player})" }))
     }
 
     fun restartExcavators() {
         if (excavators.isNotEmpty()) {
-            excavators.values.filter { it.isRunning() }.forEach { it.stop() }
-            saveExcavators()
+            excavators.values.filter { it.isRunning() }.forEach { it.stop(false) }
         }
 
         excavators.values.filter {
@@ -119,9 +120,9 @@ object ExcavateManager {
         }.forEach { it.start() }
     }
 
-    fun saveExcavators(p: Player) {
+    fun saveExcavators(player: Player) {
         saveExcavators()
-        messageU.send(p, "saveExcavators")
+        messageU.send(player, "saveExcavators")
     }
 
     fun saveExcavators() {
@@ -129,6 +130,14 @@ object ExcavateManager {
     }
 
     fun stopExcavators() {
-        excavators.values.forEach { if (it.isRunning()) it.stop() }
+        excavators.values.forEach { if (it.isRunning()) it.stop(true) }
+    }
+
+    fun addConvertedExcavators(cExcavators: List<ExcavatorV2>): Int {
+        cExcavators.forEach {
+            if (!excavators.containsKey(it.plot.id)) excavators[it.plot.id] = it
+        }
+
+        return cExcavators.size
     }
 }

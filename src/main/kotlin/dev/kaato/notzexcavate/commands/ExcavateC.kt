@@ -9,13 +9,13 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
 class ExcavateC : CommandExecutor {
-    override fun onCommand(p: CommandSender?, command: Command?, label: String?, argss: Array<out String>?): Boolean {
-        if (p !is Player) {
+    override fun onCommand(player: CommandSender?, command: Command?, label: String?, argss: Array<out String>?): Boolean {
+        if (player !is Player) {
             return false
         }
 
-        if (papi.isInPlot(p)) getExcavatorStatus(p, papi.getPlot(p))
-        else messageU.send(p, "notInPlot")
+        if (papi.isInPlot(player)) getExcavatorStatus(player, papi.getPlot(player))
+        else messageU.send(player, "notInPlot")
 
         return true
     }

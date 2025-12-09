@@ -4,9 +4,15 @@ import dev.kaato.notzapi.utils.MessageU.Companion.formatDateTime
 import dev.kaato.notzapi.utils.MessageU.Companion.join
 import dev.kaato.notzexcavate.NotzExcavate.Companion.messageU
 import dev.kaato.notzexcavate.NotzExcavate.Companion.papi
+import dev.kaato.notzexcavate.database.DatabaseManager.checkOldDatabase
+import dev.kaato.notzexcavate.database.DatabaseManager.convertExcavatorsDatabase
+import dev.kaato.notzexcavate.database.DatabaseManager.convertShovelsDatabase
+import dev.kaato.notzexcavate.database.DatabaseManager.eraseOldDatabase
+import dev.kaato.notzexcavate.managers.ExcavateManager.addConvertedExcavators
 import dev.kaato.notzexcavate.managers.ExcavateManager.removeExcavator
 import dev.kaato.notzexcavate.managers.ShovelManager.addAllowedBlock
 import dev.kaato.notzexcavate.managers.ShovelManager.addBlockedBlock
+import dev.kaato.notzexcavate.managers.ShovelManager.addConvertedShovels
 import dev.kaato.notzexcavate.managers.ShovelManager.clearAllowedBlocks
 import dev.kaato.notzexcavate.managers.ShovelManager.clearBlockedBlocks
 import dev.kaato.notzexcavate.managers.ShovelManager.deleteShovel
@@ -22,27 +28,27 @@ import org.bukkit.entity.Player
 import java.text.ParseException
 
 object CommandManager {
-    fun clearAllowedCMD(p: Player, sh: String): Boolean {
+    fun clearAllowedCMD(player: Player, sh: String): Boolean {
         val shovel = getShovel(sh) ?: return false
-        clearAllowedBlocks(p, shovel)
+        clearAllowedBlocks(player, shovel)
         return true
     }
 
-    fun clearBlockedCMD(p: Player, sh: String): Boolean {
+    fun clearBlockedCMD(player: Player, sh: String): Boolean {
         val shovel = getShovel(sh) ?: return false
-        clearBlockedBlocks(p, shovel)
+        clearBlockedBlocks(player, shovel)
         return true
     }
 
-    fun getShovelCMD(p: Player, target: String? = null, sh: String): Boolean {
+    fun getShovelCMD(player: Player, target: String? = null, sh: String): Boolean {
         var ptarget: Player? = null
-        val player = if (target == null) p else {
+        val player = if (target == null) player else {
             Bukkit.getPlayerExact(target).let {
                 if (it != null) {
                     ptarget = it
                     it
                 } else {
-                    messageU.send(p, "offlinePlayer")
+                    messageU.send(player, "offlinePlayer")
                     return@getShovelCMD false
                 }
             }
@@ -75,99 +81,122 @@ object CommandManager {
         return true
     }
 
-    fun updateItemCMD(p: Player, sh: String): Boolean {
+    fun updateItemCMD(player: Player, sh: String): Boolean {
         val shovel = getShovel(sh) ?: return false
-        updateShovel(p, shovel)
+        updateShovel(player, shovel)
         return true
     }
 
-    fun addAllowedCMD(p: Player, block: String, sh: String): Boolean {
+    fun addAllowedCMD(player: Player, block: String, sh: String): Boolean {
         val shovel = getShovel(sh) ?: return false
-        addAllowedBlock(p, block.uppercase(), shovel)
+        addAllowedBlock(player, block.uppercase(), shovel)
         return true
     }
 
-    fun addBlockedCMD(p: Player, block: String, sh: String): Boolean {
+    fun addBlockedCMD(player: Player, block: String, sh: String): Boolean {
         val shovel = getShovel(sh) ?: return false
-        addBlockedBlock(p, block.uppercase(), shovel)
+        addBlockedBlock(player, block.uppercase(), shovel)
         return true
     }
 
-    fun remAllowedCMD(p: Player, block: String, sh: String): Boolean {
+    fun remAllowedCMD(player: Player, block: String, sh: String): Boolean {
         val shovel = getShovel(sh) ?: return false
-        remAllowedBlock(p, block.uppercase(), shovel)
+        remAllowedBlock(player, block.uppercase(), shovel)
         return true
     }
 
-    fun remBlockedCMD(p: Player, block: String, sh: String): Boolean {
+    fun remBlockedCMD(player: Player, block: String, sh: String): Boolean {
         val shovel = getShovel(sh) ?: return false
-        remBlockedBlock(p, block.uppercase(), shovel)
+        remBlockedBlock(player, block.uppercase(), shovel)
         return true
     }
 
-    fun removeExcavatorCMD(p: Player) {
-        if (removeExcavator(papi.getPlot(p))) messageU.send(p, "removeExcavatorCMD1")
-        else messageU.send(p, "removeExcavatorCMD2")
+    fun removeExcavatorCMD(player: Player) {
+        when (removeExcavator(papi.getPlot(player))) {
+            true -> messageU.send(player, "removeExcavatorCMD1") // deletado
+            false -> messageU.send(player, "removeExcavatorCMD2") // nao encontrado
+            else -> messageU.send(player, "removeExcavatorCMD3") // erro deletado mais de 1
+        }
     }
 
-    fun deleteShovelCMD(p: Player, sh: String): Boolean {
+    fun deleteShovelCMD(player: Player, sh: String): Boolean {
         val shovel = getShovel(sh) ?: return false
-        if (deleteShovel(shovel)) messageU.send(p, "deleteShovelCMD", shovel.getDisplay())
-        else messageU.send(p, "deleteShovelCMD", shovel.getDisplay())
+
+        when (deleteShovel(shovel)) {
+            true -> messageU.send(player, "deleteShovelCMD1", shovel.name) // deletado
+            false -> messageU.send(player, "deleteShovelCMD2", shovel.name) // nao encontrado
+            else -> messageU.send(player, "deleteShovelCMD3", shovel.name) // erro deletado mais de 1
+        }
         return true
     }
 
-    fun setMaterialCMD(p: Player, sh: String): Boolean {
+    fun setMaterialCMD(player: Player, sh: String): Boolean {
         val shovel = getShovel(sh) ?: return false
-        if (p.itemInHand != null) {
-            messageU.send(p, "setMaterialCMD1", defaults = listOf(shovel.name, shovel.getMaterial().name, p.itemInHand.type.name))
-            shovel.setMaterial(p.itemInHand.type)
-        } else messageU.send(p, "setMaterialCMD2")
+        if (player.itemInHand != null) {
+            messageU.send(player, "setMaterialCMD1", defaults = listOf(shovel.name, shovel.getMaterial().name, player.itemInHand.type.name))
+            shovel.setMaterial(player.itemInHand.type)
+        } else messageU.send(player, "setMaterialCMD2")
         return true
     }
 
-    fun setDisplayCMD(p: Player, display: String, sh: String): Boolean {
+    fun setDisplayCMD(player: Player, display: String, sh: String): Boolean {
         val shovel = getShovel(sh) ?: return false
-        messageU.send(p, "setDisplayCMD", defaults = listOf(shovel.name, shovel.getDisplay(), display))
+        messageU.send(player, "setDisplayCMD", defaults = listOf(shovel.name, shovel.getDisplay(), display))
         shovel.setDisplay(display)
         return true
     }
 
-    fun setDurationCMD(p: Player, time: String, sh: String): Boolean {
+    fun setDurationCMD(player: Player, time: String, sh: String): Boolean {
         val shovel = getShovel(sh) ?: return false
         val duration = try {
             time.toInt()
         } catch (e: ParseException) {
-            messageU.send(p, "validNumber1")
+            messageU.send(player, "validNumber1")
             return false
         }
 
         if (duration < 1) {
-            messageU.send(p, "validNumber2")
+            messageU.send(player, "validNumber2")
             return false
         }
 
         val new = formatDateTime(minutes = duration, eng = true)
 
         if (shovel.getDuration() > 0) messageU.send(
-            p, "setDurationCMD1", defaults = listOf(shovel.name, formatDateTime(minutes = shovel.getDuration(), eng = true), new)
+            player, "setDurationCMD1", defaults = listOf(shovel.name, formatDateTime(minutes = shovel.getDuration(), eng = true), new)
         ) else messageU.send(
-            p, "setDurationCMD2", defaults = listOf(shovel.name, new)
+            player, "setDurationCMD2", defaults = listOf(shovel.name, new)
         )
 
         shovel.setDuration(duration)
         return true
     }
 
-    fun viewAllowedCMD(p: Player, sh: String): Boolean {
+    fun viewAllowedCMD(player: Player, sh: String): Boolean {
         val shovel = getShovel(sh) ?: return false
-        messageU.send(p, "viewAllowedCMD", join(shovel.getAllowedBlocks().map(Material::name)))
+        messageU.send(player, "viewAllowedCMD", join(shovel.getAllowedBlocks().map(Material::name)))
         return true
     }
 
-    fun viewBlockedCMD(p: Player, sh: String): Boolean {
+    fun viewBlockedCMD(player: Player, sh: String): Boolean {
         val shovel = getShovel(sh) ?: return false
-        messageU.send(p, "viewBlockedCMD", join(shovel.getBlockedBlocks().map(Material::name)))
+        messageU.send(player, "viewBlockedCMD", join(shovel.getBlockedBlocks().map(Material::name)))
         return true
+    }
+
+    fun convertDatabaseCMD(player: Player, shovel: String) {
+        if (!checkOldDatabase()) return
+
+        val exs = addConvertedExcavators(convertExcavatorsDatabase())
+        val shs = addConvertedShovels(convertShovelsDatabase(shovel))
+
+        messageU.send(player, messageU.set("Converted a total of {default0} Excavators and {default1} Shovels successfully!", defaults = listOf(exs.toString(), shs.toString())))
+    }
+
+    fun removeOldDatabase(player: Player) {
+        if (checkOldDatabase()) {
+            eraseOldDatabase()
+            messageU.send(player, "The old database was deleted successfully!")
+        } else messageU.send(player, "There is no old database to be deleted.")
     }
 }
