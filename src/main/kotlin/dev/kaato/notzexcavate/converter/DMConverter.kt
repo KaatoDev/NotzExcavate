@@ -1,4 +1,4 @@
-package dev.kaato.notzexcavate.dao
+package dev.kaato.notzexcavate.converter
 
 import com.intellectualcrafters.plot.`object`.PlotId
 import dev.kaato.notzexcavate.entities.Excavator
@@ -10,8 +10,8 @@ import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.sql.Connection
 
-class DM {
-    private var c: Connection = DAO().database()
+class DMConverter {
+    private var c: Connection = DAOConverter().database()
 
     // EXCAVATOR -- START
     fun insertExcavator(excavator: Excavator) {
@@ -63,20 +63,6 @@ class DM {
             ps.setString(1, plotid)
 
             ps.executeQuery().use { it.next(); return it.getInt("id") }
-        }
-    }
-
-    fun getExcavatorById(excavatorID: Int): Excavator {
-        val sql = "select * from excavatormodel where id = ?"
-
-        c.prepareStatement(sql).use { ps ->
-            ps.setInt(1, excavatorID)
-
-            ps.executeQuery().use {
-                it.next()
-
-                return deserializeExcavator(ByteArrayInputStream(it.getBytes("excavator")))[0]
-            }
         }
     }
 
@@ -171,19 +157,6 @@ class DM {
         }
     }
 
-    fun getLastShovelId(): Int {
-        val sql = "select * from shovelmodel"
-
-        c.prepareStatement(sql).use { ps ->
-            ps.executeQuery().use {
-                var id = 0
-                while (it.next())
-                    id = it.getInt("id")
-                return id
-            }
-        }
-    }
-
     fun loadShovels(): HashMap<String, Shovel> {
         val sql = "select * from shovelmodel"
 
@@ -259,5 +232,28 @@ class DM {
         dataInput.close()
 
         return shovels.filterNotNull().toTypedArray()
+    }
+
+
+    fun hasTables(): Boolean {
+        val metadata = c.metaData
+        val tables = metadata.getTables(null, null, "%", arrayOf("TABLE"))
+        val tbs = mutableListOf<String>()
+        while (tables.next()) {
+            val tb = tables.getString("TABLE_NAME")
+            if (tb == "shovelmodel" || tb == "excavatormodel")
+                tbs.add(tb)
+        }
+        tables.close()
+        return tbs.isNotEmpty()
+    }
+
+    fun dropTables() {
+        c.prepareStatement("drop table excavatormodel").use { it.execute() }
+        c.prepareStatement("drop table shovelmodel").use { it.execute() }
+    }
+
+    fun close() {
+        c.close()
     }
 }

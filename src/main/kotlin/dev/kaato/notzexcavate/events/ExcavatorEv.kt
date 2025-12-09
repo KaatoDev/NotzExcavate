@@ -41,9 +41,9 @@ class ExcavatorEv : Listener {
         removeExcavator(e.plot)
     }
 
-    private fun pass(item: ItemStack, p: Player): Boolean {
+    private fun pass(item: ItemStack, player: Player): Boolean {
         val isInPlot = try {
-            papi.isInPlot(p)
+            papi.isInPlot(player)
         } catch (e: Exception) {
             false
         }

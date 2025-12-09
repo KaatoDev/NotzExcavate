@@ -8,11 +8,13 @@ import dev.kaato.notzexcavate.managers.CommandManager.addAllowedCMD
 import dev.kaato.notzexcavate.managers.CommandManager.addBlockedCMD
 import dev.kaato.notzexcavate.managers.CommandManager.clearAllowedCMD
 import dev.kaato.notzexcavate.managers.CommandManager.clearBlockedCMD
+import dev.kaato.notzexcavate.managers.CommandManager.convertDatabaseCMD
 import dev.kaato.notzexcavate.managers.CommandManager.deleteShovelCMD
 import dev.kaato.notzexcavate.managers.CommandManager.getShovelCMD
 import dev.kaato.notzexcavate.managers.CommandManager.remAllowedCMD
 import dev.kaato.notzexcavate.managers.CommandManager.remBlockedCMD
 import dev.kaato.notzexcavate.managers.CommandManager.removeExcavatorCMD
+import dev.kaato.notzexcavate.managers.CommandManager.removeOldDatabase
 import dev.kaato.notzexcavate.managers.CommandManager.setDisplayCMD
 import dev.kaato.notzexcavate.managers.CommandManager.setDurationCMD
 import dev.kaato.notzexcavate.managers.CommandManager.setMaterialCMD
@@ -38,9 +40,9 @@ import org.bukkit.entity.Player
 import java.util.*
 
 class NExcavateC : TabExecutor {
-    override fun onCommand(p: CommandSender?, command: Command?, label: String?, argss: Array<out String>?): Boolean {
-        if (p !is Player) {
-            val sender = p as? ConsoleCommandSender ?: Bukkit.getConsoleSender()
+    override fun onCommand(player: CommandSender?, command: Command?, label: String?, argss: Array<out String>?): Boolean {
+        if (player !is Player) {
+            val sender = player as? ConsoleCommandSender ?: Bukkit.getConsoleSender()
             val msg = { messageU.send(sender, "&eUse /nex &f<&eShovel&f> &egive &f<&ePlayer&f> &f(&equantity&f)") }
 
             if (argss == null || argss.isEmpty()) {
@@ -57,30 +59,32 @@ class NExcavateC : TabExecutor {
             return true
         }
 
-        if (othersU.isntAdmin(p)) return true
+        if (othersU.isntAdmin(player)) return true
 
         if (argss == null || argss.isEmpty()) {
-            helpCmd(p)
+            helpCmd(player)
             return true
         }
 
         val args = argss.map { var arg = it; if (!it.contains('&')) arg = it.lowercase(); arg }.toTypedArray()
         val shovel = args[0]
         val hasShovel = hasShovel(shovel)
-        val help = { if (hasShovel) helpShovel(p, shovel) else helpCmd(p) }
+        val help = { if (hasShovel) helpShovel(player, shovel) else helpCmd(player) }
 
 // -----------------------------------
         when (args.size) {
             1 -> {
                 when (args[0]) {
-                    "create" -> messageU.send(p, "&eUse: &f/&enexcavator create &f<&ename&f> &f<&edisplay&f>")
-                    "excavator" -> helpExcavator(p)
-                    "list" -> messageU.send(p, join(getShovels().toList()))
-                    "restart" -> restartExcavators(p)
-                    "save" -> saveExcavators(p)
+                    "convert" -> messageU.send(player, "&eUse: &f/&enexcavator convert all&f/<&eshovel&f>")
+                    "cleanolddatabase" -> removeOldDatabase(player)
+                    "create" -> messageU.send(player, "&eUse: &f/&enexcavator create &f<&ename&f> &f<&edisplay&f>")
+                    "excavator" -> helpExcavator(player)
+                    "list" -> messageU.send(player, join(getShovels().toList()))
+                    "restart" -> restartExcavators(player)
+                    "save" -> saveExcavators(player)
                     "status" -> {
-                        if (papi.isInPlot(p)) getExcavatorStatus(p, papi.getPlot(p))
-                        else messageU.send(p, "notInPlot")
+                        if (papi.isInPlot(player)) getExcavatorStatus(player, papi.getPlot(player))
+                        else messageU.send(player, "notInPlot")
                     }
 
                     else -> help()
@@ -89,58 +93,59 @@ class NExcavateC : TabExecutor {
 // -----------------------------------
             2 -> {
                 when (args[0]) {
-                    "create" -> messageU.send(p, "&eUse: &f/&enexcavator create &f<&ename&f> &f<&edisplay&f>")
+                    "convert" -> convertDatabaseCMD(player, args[1])
+                    "create" -> messageU.send(player, "&eUse: &f/&enexcavator create &f<&ename&f> &f<&edisplay&f>")
                     "excavator" -> {
-                        if (!papi.isInPlot(p)) {
-                            messageU.send(p, "notInPlot")
+                        if (!papi.isInPlot(player)) {
+                            messageU.send(player, "notInPlot")
                             return true
                         }
 
                         when (args[1]) {
-                            "all" -> getAllExcavators(p)
-                            "completed" -> getCompletedExcavators(p)
-                            "list" -> getRunningExcavators(p)
-                            "remove" -> removeExcavatorCMD(p)
-                            "stop" -> stopExcavator(p, papi.getPlot(p))
-                            else -> helpExcavator(p)
+                            "all" -> getAllExcavators(player)
+                            "completed" -> getCompletedExcavators(player)
+                            "list" -> getRunningExcavators(player)
+                            "remove" -> removeExcavatorCMD(player)
+                            "stop" -> stopExcavator(player, papi.getPlot(player))
+                            else -> helpExcavator(player)
                         }
                     }
 
                     else -> if (hasShovel) when (args[1]) {
-                        "clearallowed" -> clearAllowedCMD(p, shovel)
-                        "clearblocked" -> clearBlockedCMD(p, shovel)
-                        "delete" -> deleteShovelCMD(p, shovel)
-                        "get" -> getShovelCMD(p, sh = shovel)
-                        "setdisplay" -> messageU.send(p, "&eUse &f/&enex &f${args[1]}&e setDisplay &f<&edisplay&f> ")
-                        "setduration" -> messageU.send(p, "&eUse &f/&enex &f${args[1]}&e setDuration &f<&eminutes&f>")
-                        "setmaterial" -> setMaterialCMD(p, shovel)
-                        "updateitem" -> updateItemCMD(p, shovel)
-                        "viewallowed" -> viewAllowedCMD(p, shovel)
-                        "viewblocked" -> viewBlockedCMD(p, shovel)
+                        "clearallowed" -> clearAllowedCMD(player, shovel)
+                        "clearblocked" -> clearBlockedCMD(player, shovel)
+                        "delete" -> deleteShovelCMD(player, shovel)
+                        "get" -> getShovelCMD(player, sh = shovel)
+                        "setdisplay" -> messageU.send(player, "&eUse &f/&enex &f${args[1]}&e setDisplay &f<&edisplay&f> ")
+                        "setduration" -> messageU.send(player, "&eUse &f/&enex &f${args[1]}&e setDuration &f<&eminutes&f>")
+                        "setmaterial" -> setMaterialCMD(player, shovel)
+                        "updateitem" -> updateItemCMD(player, shovel)
+                        "viewallowed" -> viewAllowedCMD(player, shovel)
+                        "viewblocked" -> viewBlockedCMD(player, shovel)
 
-                        else -> helpShovel(p, shovel)
+                        else -> helpShovel(player, shovel)
                     } else help()
                 }
             }
 // -----------------------------------
             3 -> {
                 when (args[0]) {
-                    "create" -> createShovel(p, args[1], args[2])
-                    "excavator" -> helpExcavator(p)
+                    "create" -> createShovel(player, args[1], args[2])
+                    "excavator" -> helpExcavator(player)
                     else -> if (hasShovel) when (args[1]) {
-                        "addallowed" -> addAllowedCMD(p, args[2].uppercase(), shovel)
-                        "addblocked" -> addBlockedCMD(p, args[2].uppercase(), shovel)
-                        "get" -> getShovelCMD(p, args[2], sh = shovel)
-                        "remallowed" -> remAllowedCMD(p, args[2], shovel)
-                        "remblocked" -> remBlockedCMD(p, args[2], shovel)
-                        "setdisplay" -> setDisplayCMD(p, argss[2], shovel)
-                        "setduration" -> setDurationCMD(p, args[2], shovel)
-                        else -> helpShovel(p, shovel)
+                        "addallowed" -> addAllowedCMD(player, args[2].uppercase(), shovel)
+                        "addblocked" -> addBlockedCMD(player, args[2].uppercase(), shovel)
+                        "get" -> getShovelCMD(player, args[2], sh = shovel)
+                        "remallowed" -> remAllowedCMD(player, args[2], shovel)
+                        "remblocked" -> remBlockedCMD(player, args[2], shovel)
+                        "setdisplay" -> setDisplayCMD(player, argss[2], shovel)
+                        "setduration" -> setDurationCMD(player, args[2], shovel)
+                        else -> helpShovel(player, shovel)
                     } else help()
                 }
             }
 
-            else -> if (args[0] == "excavator") helpExcavator(p) else help()
+            else -> if (args[0] == "excavator") helpExcavator(player) else help()
         }
 // -----------------------------------
         return true
@@ -156,7 +161,7 @@ class NExcavateC : TabExecutor {
             3 -> mutableListOf("<display>")
             else -> Collections.emptyList()
         } else when (size) {
-            1 -> mutableListOf("create", "excavator", "list", "restart", "save", "status")
+            1 -> mutableListOf("cleanOldDatabase", "convert", "create", "excavator", "list", "restart", "save", "status")
             2 -> if (args!![0] == "excavator") mutableListOf("all", "completed", "list", "remove", "stop") else if (hasShovel) mutableListOf("clearallowed", "clearblocked", "delete", "get", "setdisplay", "setduration", "setmaterial", "updateitem", "viewallowed", "viewblocked") else Collections.emptyList()
             3 -> if (hasShovel && args!![1] == "get") Bukkit.getOnlinePlayers().map(Player::getName).toMutableList() else Collections.emptyList()
             else -> if (args == null) mutableListOf("create", "excavator", "list", "restart", "save", "status") else Collections.emptyList()
@@ -164,11 +169,13 @@ class NExcavateC : TabExecutor {
     }
 
 
-    private fun helpCmd(p: Player) {
+    private fun helpCmd(player: Player) {
         messageU.sendHeader(
-            p, """
+            player, """
             &eUse &f/&7[&enexcavator &7|| &enex&7] +
-            &7+ &f<&eShovel&f> &7-  Enters the Shovel command menu.
+            &7+ &f<&eShovel&f> &7- Enters the Shovel command menu.
+            &7+ &ecleanOldDatabase - Deletes the old database
+            &7+ &econvert &f<all&f/<&eshovel&f>> &7- Convert all the old excavators and all or a specifically one of the old Shovels
             &7+ &ecreate &f<&ename&f> &f<&edisplay&f> &7- Creates a new Shovel.
             &7+ &eexcavator &7- Enters the Excavator command menu.
             &7+ &elist &7- Views the list of existing Shovels.
@@ -179,9 +186,9 @@ class NExcavateC : TabExecutor {
         )
     }
 
-    private fun helpExcavator(p: Player) {
+    private fun helpExcavator(player: Player) {
         messageU.sendHeader(
-            p, """
+            player, """
             Use: &f/&enex excavator&7 +
             &7+ &eall &7- Views the list of all existing Excavators.
             &7+ &elist &7- Shows the list of incompleted Excavators.
@@ -192,9 +199,9 @@ class NExcavateC : TabExecutor {
         )
     }
 
-    private fun helpShovel(p: Player, shovel: String) {
+    private fun helpShovel(player: Player, shovel: String) {
         messageU.sendHeader(
-            p, """
+            player, """
             Use: &f/&enex ${shovel}&7 +
             &7+ &eaddAllowed &f<&eblock&f> &7- Adds a block to the allowed list.
             &7+ &eaddBlocked &f<&eblock&f> &7- Adds a block to the blocked list.

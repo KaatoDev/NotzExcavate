@@ -41,8 +41,10 @@ messages:
   offlinePlayer: "&cThis player is offline or does not exist."
   removeExcavatorCMD1: "&eExcavator successfully removed from the plot!"
   removeExcavatorCMD2: "&cUnable to remove the Excavator!"
+  removeExcavatorCMD3: "&eThe Excavator was removed, but an &cerror &eoccurred. (See console)"
   deleteShovelCMD1: "&eShovel &f{default} &esuccessfully deleted."
   deleteShovelCMD2: "&cUnable to delete Shovel {default}&c."
+  deleteShovelCMD3: "&eShovel &f{default} &ewas deleted, but an &cerror &eoccurred. (See console)"
   setMaterialCMD1: "&eThe material of Shovel &f{default0} &ehas been changed from &f{default1} &eto &f{default2}&e."
   setMaterialCMD2: "&cHold an item in your hand to be the base material."
   setDisplayCMD: "&eThe display of Shovel &f{default0} &ehas been changed from &f{default1} &eto {default2}&e."
@@ -53,7 +55,11 @@ messages:
   setDurationCMD2: "&eThe duration of the Shovel &f{default0} &ewas set to &f{default1}&e."
   viewAllowedCMD: "&eAllowed blocks: &f{default}"
   viewBlockedCMD: "&eBlocked blocks: &f{default}"
-  getRunningExcavators1: "&e{default0}: &f{default1}"
+  getRunningExcavators1: "\n
+            &e{default0}: &f{default1}.\n
+            &e{default2}: &f{default3}.\n
+            &e{default4}: &f{default5}.
+  "
   getRunningExcavators2: "&cThere are no active, running, or paused Excavators."
   getCompletedExcavators1: "&eCompleted Excavators: &f{default}"
   getCompletedExcavators2: "&cNo completed Excavators."
