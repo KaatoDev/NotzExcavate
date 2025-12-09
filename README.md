@@ -50,6 +50,8 @@ A unique, unmistakable item system that activates the excavator. It features spe
  - Displays the Excavator's status on the current plot.
 
 ### `/nex`
+ - `cleanOldDatabase` - Deletes the old database;
+ - `convert` <all/<shovel>> - Convert all the old excavators and all or a specifically one of the old Shovels;
  - `create` \<name> \<display> - Creates a new Shovel; 
  - `excavator` - Enters the Excavator command menu;
  - `list` - Views the list of existing Shovels;
