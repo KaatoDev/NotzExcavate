@@ -84,7 +84,7 @@ class NotzExcavate : JavaPlugin() {
             object : BukkitRunnable() {
                 override fun run() {
                     startPlugin()
-                    Bukkit.getOnlinePlayers().forEach { if (it.hasPermission("notzcrates.admin")) messageU.send(it, "&2NotzEscavate &ainitialized! (${load/1000.0}s)") }
+                    othersU.sendAdmin("&2NotzEscavate &ainitialized! (${load / 1000.0}s)")
                 }
             }.runTaskLater(this, 4 * 20L)
 

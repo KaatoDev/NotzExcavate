@@ -86,7 +86,7 @@ object DatabaseManager {
                 it[status] = excavator.getStatus()
                 it[allowedBlocks] = parseToJson(excavator.getAllowedBlocks())
                 it[blockedBlocks] = parseToJson(excavator.getBlockedBlocks())
-                it[updated] = excavator.getUpdated()
+                it[updated] = LocalDateTime.now()
             }
         }
     }
@@ -187,7 +187,7 @@ object DatabaseManager {
                 it[material] = shovel.getMaterial().toString()
                 it[allowedBlocks] = parseToJson(shovel.getAllowedBlocks())
                 it[blockedBlocks] = parseToJson(shovel.getBlockedBlocks())
-                it[updated] = shovel.getUpdated()
+                it[updated] = LocalDateTime.now()
             }
         }
     }
